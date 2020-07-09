@@ -9,11 +9,14 @@
 /* Begin PBXBuildFile section */
 		5942392F24B763C300B5A438 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5942392E24B763C300B5A438 /* AppDelegate.swift */; };
 		5942393124B763C300B5A438 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5942393024B763C300B5A438 /* SceneDelegate.swift */; };
-		5942393324B763C300B5A438 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5942393224B763C300B5A438 /* ContentView.swift */; };
+		5942393324B763C300B5A438 /* PlayerContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5942393224B763C300B5A438 /* PlayerContentView.swift */; };
 		5942393524B763C600B5A438 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 5942393424B763C600B5A438 /* Assets.xcassets */; };
 		5942393824B763C600B5A438 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 5942393724B763C600B5A438 /* Preview Assets.xcassets */; };
 		5942393B24B763C600B5A438 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 5942393924B763C600B5A438 /* LaunchScreen.storyboard */; };
 		5942394624B763C700B5A438 /* BoostersTestTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5942394524B763C700B5A438 /* BoostersTestTests.swift */; };
+		5942395224B764D300B5A438 /* nature.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 5942395124B764D300B5A438 /* nature.m4a */; };
+		5942395324B764D300B5A438 /* nature.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 5942395124B764D300B5A438 /* nature.m4a */; };
+		5942395724B7780A00B5A438 /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5942395624B7780A00B5A438 /* AudioToolbox.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -30,7 +33,7 @@
 		5942392B24B763C300B5A438 /* BoostersTest.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = BoostersTest.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		5942392E24B763C300B5A438 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		5942393024B763C300B5A438 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
-		5942393224B763C300B5A438 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		5942393224B763C300B5A438 /* PlayerContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayerContentView.swift; sourceTree = "<group>"; };
 		5942393424B763C600B5A438 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		5942393724B763C600B5A438 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		5942393A24B763C600B5A438 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
@@ -38,6 +41,9 @@
 		5942394124B763C700B5A438 /* BoostersTestTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = BoostersTestTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		5942394524B763C700B5A438 /* BoostersTestTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BoostersTestTests.swift; sourceTree = "<group>"; };
 		5942394724B763C700B5A438 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		5942395124B764D300B5A438 /* nature.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = nature.m4a; sourceTree = "<group>"; };
+		5942395424B7780600B5A438 /* BoostersTest.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = BoostersTest.entitlements; sourceTree = "<group>"; };
+		5942395624B7780A00B5A438 /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = System/Library/Frameworks/AudioToolbox.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -45,6 +51,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5942395724B7780A00B5A438 /* AudioToolbox.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -64,6 +71,7 @@
 				5942392D24B763C300B5A438 /* BoostersTest */,
 				5942394424B763C700B5A438 /* BoostersTestTests */,
 				5942392C24B763C300B5A438 /* Products */,
+				5942395524B7780A00B5A438 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -79,12 +87,14 @@
 		5942392D24B763C300B5A438 /* BoostersTest */ = {
 			isa = PBXGroup;
 			children = (
+				5942395424B7780600B5A438 /* BoostersTest.entitlements */,
 				5942392E24B763C300B5A438 /* AppDelegate.swift */,
 				5942393024B763C300B5A438 /* SceneDelegate.swift */,
-				5942393224B763C300B5A438 /* ContentView.swift */,
+				5942393224B763C300B5A438 /* PlayerContentView.swift */,
 				5942393424B763C600B5A438 /* Assets.xcassets */,
 				5942393924B763C600B5A438 /* LaunchScreen.storyboard */,
 				5942393C24B763C600B5A438 /* Info.plist */,
+				5942395024B764B700B5A438 /* Resources */,
 				5942393624B763C600B5A438 /* Preview Content */,
 			);
 			path = BoostersTest;
@@ -105,6 +115,22 @@
 				5942394724B763C700B5A438 /* Info.plist */,
 			);
 			path = BoostersTestTests;
+			sourceTree = "<group>";
+		};
+		5942395024B764B700B5A438 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				5942395124B764D300B5A438 /* nature.m4a */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
+		5942395524B7780A00B5A438 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				5942395624B7780A00B5A438 /* AudioToolbox.framework */,
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -189,6 +215,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				5942393B24B763C600B5A438 /* LaunchScreen.storyboard in Resources */,
+				5942395224B764D300B5A438 /* nature.m4a in Resources */,
 				5942393824B763C600B5A438 /* Preview Assets.xcassets in Resources */,
 				5942393524B763C600B5A438 /* Assets.xcassets in Resources */,
 			);
@@ -198,6 +225,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5942395324B764D300B5A438 /* nature.m4a in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -210,7 +238,7 @@
 			files = (
 				5942392F24B763C300B5A438 /* AppDelegate.swift in Sources */,
 				5942393124B763C300B5A438 /* SceneDelegate.swift in Sources */,
-				5942393324B763C300B5A438 /* ContentView.swift in Sources */,
+				5942393324B763C300B5A438 /* PlayerContentView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -362,6 +390,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = BoostersTest/BoostersTest.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_ASSET_PATHS = "\"BoostersTest/Preview Content\"";
 				DEVELOPMENT_TEAM = 8JL9EGKR79;
@@ -382,6 +411,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = BoostersTest/BoostersTest.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_ASSET_PATHS = "\"BoostersTest/Preview Content\"";
 				DEVELOPMENT_TEAM = 8JL9EGKR79;

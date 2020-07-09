@@ -1,5 +1,5 @@
 //
-//  ContentView.swift
+//  PlayerContentView.swift
 //  BoostersTest
 //
 //  Created by Dmytro Pasinchuk on 09.07.2020.
@@ -8,14 +8,14 @@
 
 import SwiftUI
 
-struct ContentView: View {
+struct PlayerContentView: View {
     var body: some View {
         Text("Hello, World!")
     }
 }
 
-struct ContentView_Previews: PreviewProvider {
+struct PlayerContentView_Previews: PreviewProvider {
     static var previews: some View {
-        ContentView()
+        PlayerContentView()
     }
 }
