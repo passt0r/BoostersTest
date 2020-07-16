@@ -24,32 +24,76 @@ public final class PlayerViewModel: ObservableObject {
     public var possibkeRecordingTimers = ["off", "1 min", "5 min", "1 hour"]
     
     func toggleAudioFlow(withSoundTimer selectedSoundTimer: Int, withRecordingTimer selectedRecordingTimer: Int) {
+        guard selectedSoundTimer != 0 || selectedRecordingTimer != 0 else {
+            stopAudioPlaying()
+            stopAudioRecording()
+            self.playerState = .idle
+            return
+        }
         switch playerState {
         case .idle:
             playerState = .playing
+            loadAudioForPlaying()
         case .playing:
             playerState = .pausedFromPlaying
+            soundAudioPlayer?.pause()
         case .recording:
             playerState = .pausedFromRecording
         case .pausedFromPlaying:
             playerState = .playing
+            soundAudioPlayer?.play()
         case .pausedFromRecording:
             playerState = .recording
         }
         loadAudioForPlaying()
     }
     
+}
+
+//MARK: - Audio player
+extension PlayerViewModel {
+    private func stopAudioPlaying() {
+        soundAudioPlayer?.stop()
+        soundAudioPlayer = nil
+    }
+    
     private func loadAudioForPlaying() {
-        let path = Bundle.main.path(forResource: "nature.m4a", ofType: nil)!
+        guard let path = Bundle.main.path(forResource: "nature.m4a", ofType: nil) else { return }
         let url = URL(fileURLWithPath: path)
 
         do {
+            try AVAudioSession.sharedInstance().setCategory(.playback, mode: .default)
+            print("Playback OK")
+            try AVAudioSession.sharedInstance().setActive(true)
+            print("Session is active")
             soundAudioPlayer = try AVAudioPlayer(contentsOf: url)
-            soundAudioPlayer?.numberOfLoops = 10
+            soundAudioPlayer?.numberOfLoops = -1
+            soundAudioPlayer?.prepareToPlay()
             soundAudioPlayer?.play()
+            print("Player starts to play")
         } catch {
-            // couldn't load file :(
+            print(error.localizedDescription)
         }
     }
+}
+
+//MARK: - Audio recorder
+extension PlayerViewModel {
+    private func stopAudioRecording() {
+        audioRecorder?.stop()
+        audioRecorder = nil
+        recordingSession = nil
+    }
     
+    private func startAudioRecording() {
+        requestRecording()
+    }
+    
+    private func requestRecording() {
+        
+    }
+    
+    private func startRecording() {
+        
+    }
 }

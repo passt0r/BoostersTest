@@ -21,7 +21,7 @@ struct PlayerContentView: View {
             Text(viewModel.playerState.rawValue)
                 .font(.headline)
                 .multilineTextAlignment(.center)
-            if (viewModel.playerState == .idle) {
+            if (viewModel.playerState != .idle) {
                 Text("Remain N sec...").padding(.top)
             } else {
                 Text("Remain N sec...").padding(.top).hidden()
@@ -37,7 +37,10 @@ struct PlayerContentView: View {
                 if viewModel.playerState == .idle || viewModel.playerState == .pausedFromPlaying || viewModel.playerState == .pausedFromRecording {
                     Text("Start")
                         .padding(.vertical)
-                } else {
+                } else if selectedSoundTimer == 0 || selectedRecordingTimer == 0 {
+                    Text("Stop")
+                        .padding(.vertical)
+                } else  {
                     Text("Pause")
                         .padding(.vertical)
                 }
