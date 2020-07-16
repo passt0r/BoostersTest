@@ -17,6 +17,7 @@
 		5942395224B764D300B5A438 /* nature.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 5942395124B764D300B5A438 /* nature.m4a */; };
 		5942395324B764D300B5A438 /* nature.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 5942395124B764D300B5A438 /* nature.m4a */; };
 		5942395724B7780A00B5A438 /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5942395624B7780A00B5A438 /* AudioToolbox.framework */; };
+		59AB45E924C0EB7100A1CE80 /* PlayerViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 59AB45E824C0EB7100A1CE80 /* PlayerViewModel.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -44,6 +45,7 @@
 		5942395124B764D300B5A438 /* nature.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = nature.m4a; sourceTree = "<group>"; };
 		5942395424B7780600B5A438 /* BoostersTest.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = BoostersTest.entitlements; sourceTree = "<group>"; };
 		5942395624B7780A00B5A438 /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = System/Library/Frameworks/AudioToolbox.framework; sourceTree = SDKROOT; };
+		59AB45E824C0EB7100A1CE80 /* PlayerViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayerViewModel.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -91,6 +93,7 @@
 				5942392E24B763C300B5A438 /* AppDelegate.swift */,
 				5942393024B763C300B5A438 /* SceneDelegate.swift */,
 				5942393224B763C300B5A438 /* PlayerContentView.swift */,
+				59AB45E824C0EB7100A1CE80 /* PlayerViewModel.swift */,
 				5942393424B763C600B5A438 /* Assets.xcassets */,
 				5942393924B763C600B5A438 /* LaunchScreen.storyboard */,
 				5942393C24B763C600B5A438 /* Info.plist */,
@@ -237,6 +240,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				5942392F24B763C300B5A438 /* AppDelegate.swift in Sources */,
+				59AB45E924C0EB7100A1CE80 /* PlayerViewModel.swift in Sources */,
 				5942393124B763C300B5A438 /* SceneDelegate.swift in Sources */,
 				5942393324B763C300B5A438 /* PlayerContentView.swift in Sources */,
 			);
