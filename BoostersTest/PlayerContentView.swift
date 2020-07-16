@@ -34,8 +34,13 @@ struct PlayerContentView: View {
             Button(action: {
                 self.viewModel.toggleAudioFlow(withSoundTimer: selectedSoundTimer, withRecordingTimer: selectedRecordingTimer)
             }) {
-                Text("Start")
-                    .padding(.vertical)
+                if viewModel.playerState == .idle || viewModel.playerState == .pausedFromPlaying || viewModel.playerState == .pausedFromRecording {
+                    Text("Start")
+                        .padding(.vertical)
+                } else {
+                    Text("Pause")
+                        .padding(.vertical)
+                }
             }
         }
         .padding(.bottom)
