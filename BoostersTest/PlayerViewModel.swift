@@ -33,8 +33,7 @@ public final class PlayerViewModel: ObservableObject {
     func toggleAudioFlow(withSoundTimer selectedSoundTimer: Int, withRecordingTimer selectedRecordingTimer: Int) {
         guard selectedSoundTimer != 0 || selectedRecordingTimer != 0 else {
             stopAudioPlaying()
-            stopAudioRecording()
-            self.playerState = .idle
+            finishRecording()
             return
         }
         switch playerState {
@@ -321,5 +320,6 @@ extension PlayerViewModel {
     func finishRecording() {
         stopAudioRecording()
         self.playerState = .idle
+        self.subscriptions.removeAll()
     }
 }
