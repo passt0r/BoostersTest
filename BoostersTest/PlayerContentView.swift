@@ -21,8 +21,10 @@ struct PlayerContentView: View {
             Text(viewModel.playerState.rawValue)
                 .font(.headline)
                 .multilineTextAlignment(.center)
-            if (viewModel.playerState != .idle) {
-                Text("Remain N sec...").padding(.top)
+            if (viewModel.playerState == .playing) {
+                Text("Remain \(Int(viewModel.playingRemainingPlayingTime)) sec...").padding(.top)
+            } else if (viewModel.playerState == .recording) {
+                Text("Remain \(Int(viewModel.recordingRemainingPlayingTime)) sec...").padding(.top)
             } else {
                 Text("Remain N sec...").padding(.top).hidden()
             }

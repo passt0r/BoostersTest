@@ -15,10 +15,16 @@ public final class PlayerViewModel: ObservableObject {
     public enum PlayerState: String {
       case idle = "Idle", playing = "Playing", recording = "Recording", pausedFromPlaying = "Playing paused", pausedFromRecording = "Recording paused"
     }
+    private var subscriptions = Set<AnyCancellable>()
     
     private var soundAudioPlayer: AVAudioPlayer?
     private var recordingSession: AVAudioSession?
     private var audioRecorder: AVAudioRecorder?
+    
+    private let timer = Timer.publish(every: 1, on: .current, in: .common).autoconnect()
+    
+    @Published var playingRemainingPlayingTime: TimeInterval = 0
+    @Published var recordingRemainingPlayingTime: TimeInterval = 0
     
     @Published public var playerState: PlayerState = .idle
     public var possibkeSoundTimers = ["off", "1 min", "5 min", "10 min"]
@@ -34,21 +40,79 @@ public final class PlayerViewModel: ObservableObject {
         switch playerState {
         case .idle:
             playerState = .playing
+            setRemainingTimeIntervals(withPlayingTimeIntervalPosition: selectedSoundTimer, withRecordingTimeIntervalPosition: selectedRecordingTimer)
             loadAudioForPlaying()
         case .playing:
-            playerState = .pausedFromPlaying
-            soundAudioPlayer?.pause()
+            pauseAudioPlaying()
         case .recording:
-            playerState = .pausedFromRecording
+            pauseAudioRecording()
         case .pausedFromPlaying:
-            playerState = .playing
-            soundAudioPlayer?.play()
+            resumeAudioPlay()
         case .pausedFromRecording:
-            playerState = .recording
+            resumeAudioRecording()
         }
-        loadAudioForPlaying()
     }
     
+    private func setRemainingTimeIntervals(withPlayingTimeIntervalPosition: Int, withRecordingTimeIntervalPosition: Int) {
+        setPlayingRemainingTimeInterval(withPlayingTimeIntervalPosition: withPlayingTimeIntervalPosition)
+        setRecordingRemainingTimeInterval(withRecordingTimeIntervalPosition: withRecordingTimeIntervalPosition)
+    }
+    
+    private func setPlayingRemainingTimeInterval(withPlayingTimeIntervalPosition: Int) {
+        switch withPlayingTimeIntervalPosition {
+        case 0:
+            self.playingRemainingPlayingTime = 0
+        case 1:
+            self.playingRemainingPlayingTime = 60
+        case 2:
+            self.playingRemainingPlayingTime = 60 * 5
+        case 3:
+            self.playingRemainingPlayingTime = 60 * 60
+        default:
+            self.playingRemainingPlayingTime = 0
+        }
+    }
+    
+    private func setRecordingRemainingTimeInterval(withRecordingTimeIntervalPosition: Int) {
+        switch withRecordingTimeIntervalPosition {
+        case 0:
+            self.recordingRemainingPlayingTime = 0
+        case 1:
+            self.recordingRemainingPlayingTime = 60
+        case 2:
+            self.recordingRemainingPlayingTime = 60 * 5
+        case 3:
+            self.recordingRemainingPlayingTime = 60 * 10
+        default:
+            self.recordingRemainingPlayingTime = 0
+        }
+    }
+    
+    @objc private func checkPlayerStatus() {
+        switch playerState {
+        case .playing:
+            let remainingPlayingTime = playingRemainingPlayingTime - 1
+            print("Remaining playing time: \(remainingPlayingTime)")
+            if remainingPlayingTime <= 0 {
+                playingRemainingPlayingTime = 0
+                stopAudioPlaying()
+                startAudioRecording()
+            } else {
+                playingRemainingPlayingTime = remainingPlayingTime
+            }
+        case .recording:
+            let remainingRecordingTime = recordingRemainingPlayingTime - 1
+            print("Remaining recording time: \(remainingRecordingTime)")
+            if remainingRecordingTime <= 0 {
+                recordingRemainingPlayingTime = 0
+                finishRecording()
+            } else {
+                recordingRemainingPlayingTime = remainingRecordingTime
+            }
+        default:
+            break
+        }
+    }
 }
 
 //MARK: - Audio player
@@ -68,10 +132,17 @@ extension PlayerViewModel {
         playerState = .playing
     }
     
+    private func startAudioCycle() {
+        requestRecording()
+    }
+    
     private func loadAudioForPlaying() {
         guard let path = Bundle.main.path(forResource: "nature.m4a", ofType: nil) else { return }
         let url = URL(fileURLWithPath: path)
-
+        timer.sink { [unowned self] (_) in
+            self.checkPlayerStatus()
+        }.store(in: &subscriptions)
+        
         do {
             try AVAudioSession.sharedInstance().setCategory(.playback, mode: .default)
             print("Playback OK")
