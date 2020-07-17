@@ -141,7 +141,7 @@ extension PlayerViewModel {
         timer.sink { [unowned self] (_) in
             self.checkPlayerStatus()
         }.store(in: &subscriptions)
-        
+        setupNotifications()
         do {
             try AVAudioSession.sharedInstance().setCategory(.playback, mode: .default)
             print("Playback OK")
