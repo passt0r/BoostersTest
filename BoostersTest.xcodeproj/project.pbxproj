@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		59353A5C24C5E3040034D146 /* PlayerState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 59353A5B24C5E3040034D146 /* PlayerState.swift */; };
 		5942392F24B763C300B5A438 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5942392E24B763C300B5A438 /* AppDelegate.swift */; };
 		5942393124B763C300B5A438 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5942393024B763C300B5A438 /* SceneDelegate.swift */; };
 		5942393324B763C300B5A438 /* PlayerContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5942393224B763C300B5A438 /* PlayerContentView.swift */; };
@@ -17,6 +18,9 @@
 		5942395224B764D300B5A438 /* nature.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 5942395124B764D300B5A438 /* nature.m4a */; };
 		5942395324B764D300B5A438 /* nature.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 5942395124B764D300B5A438 /* nature.m4a */; };
 		5942395724B7780A00B5A438 /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5942395624B7780A00B5A438 /* AudioToolbox.framework */; };
+		5980FE2224C5B08C00D115B2 /* PlayerModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5980FE2124C5B08C00D115B2 /* PlayerModel.swift */; };
+		5980FE2424C5BDE300D115B2 /* PlayerNotificationHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5980FE2324C5BDE300D115B2 /* PlayerNotificationHandler.swift */; };
+		5980FE2624C5CFBF00D115B2 /* Duration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5980FE2524C5CFBF00D115B2 /* Duration.swift */; };
 		59AB45E924C0EB7100A1CE80 /* PlayerViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 59AB45E824C0EB7100A1CE80 /* PlayerViewModel.swift */; };
 /* End PBXBuildFile section */
 
@@ -31,6 +35,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		59353A5B24C5E3040034D146 /* PlayerState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayerState.swift; sourceTree = "<group>"; };
 		5942392B24B763C300B5A438 /* BoostersTest.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = BoostersTest.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		5942392E24B763C300B5A438 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		5942393024B763C300B5A438 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -45,6 +50,9 @@
 		5942395124B764D300B5A438 /* nature.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = nature.m4a; sourceTree = "<group>"; };
 		5942395424B7780600B5A438 /* BoostersTest.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = BoostersTest.entitlements; sourceTree = "<group>"; };
 		5942395624B7780A00B5A438 /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = System/Library/Frameworks/AudioToolbox.framework; sourceTree = SDKROOT; };
+		5980FE2124C5B08C00D115B2 /* PlayerModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayerModel.swift; sourceTree = "<group>"; };
+		5980FE2324C5BDE300D115B2 /* PlayerNotificationHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayerNotificationHandler.swift; sourceTree = "<group>"; };
+		5980FE2524C5CFBF00D115B2 /* Duration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Duration.swift; sourceTree = "<group>"; };
 		59AB45E824C0EB7100A1CE80 /* PlayerViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayerViewModel.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -94,6 +102,10 @@
 				5942393024B763C300B5A438 /* SceneDelegate.swift */,
 				5942393224B763C300B5A438 /* PlayerContentView.swift */,
 				59AB45E824C0EB7100A1CE80 /* PlayerViewModel.swift */,
+				5980FE2324C5BDE300D115B2 /* PlayerNotificationHandler.swift */,
+				5980FE2124C5B08C00D115B2 /* PlayerModel.swift */,
+				5980FE2524C5CFBF00D115B2 /* Duration.swift */,
+				59353A5B24C5E3040034D146 /* PlayerState.swift */,
 				5942393424B763C600B5A438 /* Assets.xcassets */,
 				5942393924B763C600B5A438 /* LaunchScreen.storyboard */,
 				5942393C24B763C600B5A438 /* Info.plist */,
@@ -239,7 +251,11 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5980FE2424C5BDE300D115B2 /* PlayerNotificationHandler.swift in Sources */,
+				5980FE2224C5B08C00D115B2 /* PlayerModel.swift in Sources */,
+				59353A5C24C5E3040034D146 /* PlayerState.swift in Sources */,
 				5942392F24B763C300B5A438 /* AppDelegate.swift in Sources */,
+				5980FE2624C5CFBF00D115B2 /* Duration.swift in Sources */,
 				59AB45E924C0EB7100A1CE80 /* PlayerViewModel.swift in Sources */,
 				5942393124B763C300B5A438 /* SceneDelegate.swift in Sources */,
 				5942393324B763C300B5A438 /* PlayerContentView.swift in Sources */,

@@ -11,10 +11,11 @@ import AVFoundation
 import Dispatch
 import MediaPlayer
 
-public final class PlayerViewModel: ObservableObject {
-    public enum PlayerState: String {
-      case idle = "Idle", playing = "Playing", recording = "Recording", pausedFromPlaying = "Playing paused", pausedFromRecording = "Recording paused"
-    }
+public final class PlayerViewModel: ObservableObject, PlayerStateHandlerInteractionProtocol {
+    
+    let playerModel: PlayerModel
+    var playerNotificationHandler: PlayerNotificationHandler?
+    
     private var subscriptions = Set<AnyCancellable>()
     
     private var soundAudioPlayer: AVAudioPlayer?
@@ -23,23 +24,31 @@ public final class PlayerViewModel: ObservableObject {
     
     private let timer = Timer.publish(every: 1, on: .current, in: .common).autoconnect()
     
-    @Published var playingRemainingPlayingTime: TimeInterval = 0
-    @Published var recordingRemainingPlayingTime: TimeInterval = 0
+    @Published var soundPlayingRemainingTime: TimeInterval = 0
+    @Published var recordingRemainingTime: TimeInterval = 0
     
     @Published public var playerState: PlayerState = .idle
-    public var possibkeSoundTimers = ["off", "1 min", "5 min", "10 min"]
-    public var possibkeRecordingTimers = ["off", "1 min", "5 min", "1 hour"]
     
-    func toggleAudioFlow(withSoundTimer selectedSoundTimer: Int, withRecordingTimer selectedRecordingTimer: Int) {
-        guard selectedSoundTimer != 0 || selectedRecordingTimer != 0 else {
+    init() {
+        self.playerModel = PlayerModel()
+        defer {
+            self.playerNotificationHandler = PlayerNotificationHandler(playerDelegate: self)
+        }
+    }
+    
+    func toggleAudioFlow(withSoundTimer selectedSoundTimerPosition: Int, withRecordingTimer selectedRecordingTimerPosition: Int) {
+        let selectedSoundDuration = playerModel.possibleSoundTimers[selectedSoundTimerPosition].durationInSeconds
+        let selectedRecordingDuration = playerModel.possibleRecordingTimers[selectedRecordingTimerPosition].durationInSeconds
+        guard selectedSoundDuration != 0 || selectedRecordingDuration != 0 else {
             stopAudioPlaying()
             finishRecording()
             return
         }
+        
         switch playerState {
         case .idle:
             playerState = .playing
-            setRemainingTimeIntervals(withPlayingTimeIntervalPosition: selectedSoundTimer, withRecordingTimeIntervalPosition: selectedRecordingTimer)
+            setRemainingTimersDuration(withPlayingTimeInterval: selectedSoundDuration, withRecordingTimeInterval: selectedRecordingDuration)
             loadAudioForPlaying()
         case .playing:
             pauseAudioPlaying()
@@ -52,61 +61,31 @@ public final class PlayerViewModel: ObservableObject {
         }
     }
     
-    private func setRemainingTimeIntervals(withPlayingTimeIntervalPosition: Int, withRecordingTimeIntervalPosition: Int) {
-        setPlayingRemainingTimeInterval(withPlayingTimeIntervalPosition: withPlayingTimeIntervalPosition)
-        setRecordingRemainingTimeInterval(withRecordingTimeIntervalPosition: withRecordingTimeIntervalPosition)
+    private func setRemainingTimersDuration(withPlayingTimeInterval: TimeInterval, withRecordingTimeInterval: TimeInterval) {
+        self.soundPlayingRemainingTime = withPlayingTimeInterval
+        self.recordingRemainingTime = withRecordingTimeInterval
     }
     
-    private func setPlayingRemainingTimeInterval(withPlayingTimeIntervalPosition: Int) {
-        switch withPlayingTimeIntervalPosition {
-        case 0:
-            self.playingRemainingPlayingTime = 0
-        case 1:
-            self.playingRemainingPlayingTime = 60
-        case 2:
-            self.playingRemainingPlayingTime = 60 * 5
-        case 3:
-            self.playingRemainingPlayingTime = 60 * 60
-        default:
-            self.playingRemainingPlayingTime = 0
-        }
-    }
-    
-    private func setRecordingRemainingTimeInterval(withRecordingTimeIntervalPosition: Int) {
-        switch withRecordingTimeIntervalPosition {
-        case 0:
-            self.recordingRemainingPlayingTime = 0
-        case 1:
-            self.recordingRemainingPlayingTime = 60
-        case 2:
-            self.recordingRemainingPlayingTime = 60 * 5
-        case 3:
-            self.recordingRemainingPlayingTime = 60 * 10
-        default:
-            self.recordingRemainingPlayingTime = 0
-        }
-    }
-    
-    @objc private func checkPlayerStatus() {
+    private func checkPlayerStatus() {
         switch playerState {
         case .playing:
-            let remainingPlayingTime = playingRemainingPlayingTime - 1
+            let remainingPlayingTime = soundPlayingRemainingTime - 1
             print("Remaining playing time: \(remainingPlayingTime)")
             if remainingPlayingTime <= 0 {
-                playingRemainingPlayingTime = 0
+                soundPlayingRemainingTime = 0
                 stopAudioPlaying()
                 startAudioRecording()
             } else {
-                playingRemainingPlayingTime = remainingPlayingTime
+                soundPlayingRemainingTime = remainingPlayingTime
             }
         case .recording:
-            let remainingRecordingTime = recordingRemainingPlayingTime - 1
+            let remainingRecordingTime = recordingRemainingTime - 1
             print("Remaining recording time: \(remainingRecordingTime)")
             if remainingRecordingTime <= 0 {
-                recordingRemainingPlayingTime = 0
+                recordingRemainingTime = 0
                 finishRecording()
             } else {
-                recordingRemainingPlayingTime = remainingRecordingTime
+                recordingRemainingTime = remainingRecordingTime
             }
         default:
             break
@@ -114,19 +93,23 @@ public final class PlayerViewModel: ObservableObject {
     }
 }
 
+extension PlayerViewModel {
+    
+}
+
 //MARK: - Audio player
 extension PlayerViewModel {
-    private func stopAudioPlaying() {
+    func stopAudioPlaying() {
         soundAudioPlayer?.stop()
         soundAudioPlayer = nil
     }
     
-    private func pauseAudioPlaying() {
+    func pauseAudioPlaying() {
         soundAudioPlayer?.pause()
         playerState = .pausedFromPlaying
     }
     
-    private func resumeAudioPlay() {
+    func resumeAudioPlay() {
         soundAudioPlayer?.play()
         playerState = .playing
     }
@@ -253,18 +236,18 @@ extension PlayerViewModel {
 
 //MARK: - Audio recorder
 extension PlayerViewModel {
-    private func stopAudioRecording() {
+    func stopAudioRecording() {
         audioRecorder?.stop()
         audioRecorder = nil
         recordingSession = nil
     }
     
-    private func pauseAudioRecording() {
+    func pauseAudioRecording() {
         audioRecorder?.pause()
         playerState = .pausedFromRecording
     }
     
-    private func resumeAudioRecording() {
+    func resumeAudioRecording() {
         audioRecorder?.record()
         playerState = .recording
     }
@@ -312,7 +295,7 @@ extension PlayerViewModel {
         }
     }
     
-    func getDocumentsDirectory() -> URL {
+    private func getDocumentsDirectory() -> URL {
         let paths = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)
         return paths[0]
     }
