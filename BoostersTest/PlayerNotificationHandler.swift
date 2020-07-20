@@ -6,9 +6,7 @@
 //  Copyright © 2020 Dmytro Pasinchuk. All rights reserved.
 //
 
-import Combine
 import AVFoundation
-import Dispatch
 import MediaPlayer
 
 protocol PlayerStateHandlerInteractionProtocol: AnyObject {

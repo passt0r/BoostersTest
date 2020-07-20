@@ -9,7 +9,6 @@
 import Combine
 import AVFoundation
 import Dispatch
-import MediaPlayer
 
 public final class PlayerViewModel: ObservableObject {
     
