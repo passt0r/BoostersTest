@@ -25,10 +25,10 @@ protocol PlayerNotificationHandlerProtocol: AnyObject {
     func setupNotifications()
 }
 
-class PlayerNotificationHandler {
+class PlayerNotificationHandler: PlayerNotificationHandlerProtocol {
     private weak var playerDelegate: PlayerStateHandlerInteractionProtocol?
     
-    init(playerDelegate: PlayerStateHandlerInteractionProtocol) {
+    required init(playerDelegate: PlayerStateHandlerInteractionProtocol) {
         self.playerDelegate = playerDelegate
     }
     

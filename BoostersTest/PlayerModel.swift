@@ -22,4 +22,7 @@ public class PlayerModel {
         Duration(readableDuration: "5 min", durationInSeconds: 60*5),
         Duration(readableDuration: "1 hour", durationInSeconds: 60*60)
     ]
+    
+    public let audioFileName = "nature.m4a"
+    public let recordedFileName = "recording.m4a"
 }

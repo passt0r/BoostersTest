@@ -21,8 +21,6 @@ public final class PlayerViewModel: ObservableObject {
     private var audioSession: AVAudioSession?
     private var audioRecorder: AVAudioRecorder?
     
-    private let timer = Timer.publish(every: 1, on: .current, in: .common).autoconnect()
-    
     @Published var soundPlayingRemainingTime: TimeInterval = 0
     @Published var recordingRemainingTime: TimeInterval = 0
     
@@ -102,15 +100,24 @@ extension PlayerViewModel: PlayerStateHandlerInteractionProtocol {
     }
     
     func pauseAudioPlaying() {
-        soundAudioPlayer?.pause()
         pauseAudioRecorer()
+        soundAudioPlayer?.pause()
         playerState = .pausedFromPlaying
     }
     
     func resumeAudioPlay() {
-        soundAudioPlayer?.play()
         setupAudioRecordingStart()
+        setupAudioPlayStart()
         playerState = .playing
+    }
+    
+    private func setupAudioPlayStart() {
+        do {
+            try audioSession?.setCategory(.playback, mode: .default)
+            soundAudioPlayer?.play()
+        } catch {
+            print(error.localizedDescription)
+        }
     }
     
     func startAudioCycle() {
@@ -121,13 +128,16 @@ extension PlayerViewModel: PlayerStateHandlerInteractionProtocol {
     }
     
     private func loadAudioForPlaying() {
-        let playedAudioFilename = "nature.m4a"
+        let playedAudioFilename = playerModel.audioFileName
         guard let path = Bundle.main.path(forResource: playedAudioFilename, ofType: nil) else { return }
         let url = URL(fileURLWithPath: path)
         
-        timer.sink { [unowned self] (_) in
-            self.checkPlayerStatus()
-        }.store(in: &subscriptions)
+        Timer
+            .publish(every: 1, on: .current, in: .common)
+            .autoconnect()
+            .sink { [unowned self] (_) in
+                self.checkPlayerStatus()
+            }.store(in: &subscriptions)
         
         playerNotificationHandler?.setupNotifications()
         
@@ -169,7 +179,12 @@ extension PlayerViewModel {
     }
     
     private func setupAudioRecordingStart() {
-        audioRecorder?.record(atTime: audioRecorder?.currentTime ?? 0 + soundPlayingRemainingTime)
+        do {
+            try audioSession?.setCategory(.playAndRecord, mode: .default)
+            audioRecorder?.record(atTime: audioRecorder?.currentTime ?? 0 + soundPlayingRemainingTime)
+        } catch {
+            print(error.localizedDescription)
+        }
     }
     
     private func pauseAudioRecorer() {
@@ -200,7 +215,8 @@ extension PlayerViewModel {
     }
     
     private func prepareRecordingSession() {
-        let recordedAudioFilename = getDocumentsDirectory().appendingPathComponent("recording.m4a")
+        let recordedFileName = playerModel.recordedFileName
+        let recordedAudioFilename = getDocumentsDirectory().appendingPathComponent(recordedFileName)
 
         let settings = [
             AVFormatIDKey: Int(kAudioFormatMPEG4AAC),
@@ -222,7 +238,7 @@ extension PlayerViewModel {
     }
     
     private func startRecording() {
-        //Call in time when audio recorder session starts a delayed record process
+        //Called in time when audio recorder session starts a delayed record process
         self.playerState = .recording
     }
     
