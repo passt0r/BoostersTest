@@ -20,6 +20,11 @@ protocol PlayerStateHandlerInteractionProtocol: AnyObject {
     func finishRecording()
 }
 
+protocol PlayerNotificationHandlerProtocol: AnyObject {
+    init(playerDelegate: PlayerStateHandlerInteractionProtocol)
+    func setupNotifications()
+}
+
 class PlayerNotificationHandler {
     private weak var playerDelegate: PlayerStateHandlerInteractionProtocol?
     

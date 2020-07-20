@@ -13,7 +13,7 @@ import Dispatch
 public final class PlayerViewModel: ObservableObject {
     
     let playerModel: PlayerModel
-    var playerNotificationHandler: PlayerNotificationHandler?
+    var playerNotificationHandler: PlayerNotificationHandlerProtocol?
     
     private var subscriptions = Set<AnyCancellable>()
     
