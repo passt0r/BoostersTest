@@ -29,7 +29,7 @@ class PlayerNotificationHandler {
         self.playerDelegate = playerDelegate
     }
     
-    private func setupNotifications() {
+    func setupNotifications() {
         // Get the default notification center instance.
         let notificationCenter = NotificationCenter.default
         notificationCenter.addObserver(self,

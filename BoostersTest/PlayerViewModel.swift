@@ -11,7 +11,7 @@ import AVFoundation
 import Dispatch
 import MediaPlayer
 
-public final class PlayerViewModel: ObservableObject, PlayerStateHandlerInteractionProtocol {
+public final class PlayerViewModel: ObservableObject {
     
     let playerModel: PlayerModel
     var playerNotificationHandler: PlayerNotificationHandler?
@@ -19,7 +19,7 @@ public final class PlayerViewModel: ObservableObject, PlayerStateHandlerInteract
     private var subscriptions = Set<AnyCancellable>()
     
     private var soundAudioPlayer: AVAudioPlayer?
-    private var recordingSession: AVAudioSession?
+    private var audioSession: AVAudioSession?
     private var audioRecorder: AVAudioRecorder?
     
     private let timer = Timer.publish(every: 1, on: .current, in: .common).autoconnect()
@@ -49,7 +49,7 @@ public final class PlayerViewModel: ObservableObject, PlayerStateHandlerInteract
         case .idle:
             playerState = .playing
             setRemainingTimersDuration(withPlayingTimeInterval: selectedSoundDuration, withRecordingTimeInterval: selectedRecordingDuration)
-            loadAudioForPlaying()
+            startAudioCycle()
         case .playing:
             pauseAudioPlaying()
         case .recording:
@@ -93,12 +93,8 @@ public final class PlayerViewModel: ObservableObject, PlayerStateHandlerInteract
     }
 }
 
-extension PlayerViewModel {
-    
-}
-
 //MARK: - Audio player
-extension PlayerViewModel {
+extension PlayerViewModel: PlayerStateHandlerInteractionProtocol {
     func stopAudioPlaying() {
         soundAudioPlayer?.stop()
         soundAudioPlayer = nil
@@ -115,20 +111,26 @@ extension PlayerViewModel {
     }
     
     private func startAudioCycle() {
-        requestRecording()
+        requestRecordingPrivelegies { [unowned self] in
+            self.loadAudioForPlaying()
+        }
     }
     
     private func loadAudioForPlaying() {
-        guard let path = Bundle.main.path(forResource: "nature.m4a", ofType: nil) else { return }
+        let playedAudioFilename = "nature.m4a"
+        guard let path = Bundle.main.path(forResource: playedAudioFilename, ofType: nil) else { return }
         let url = URL(fileURLWithPath: path)
+        
         timer.sink { [unowned self] (_) in
             self.checkPlayerStatus()
         }.store(in: &subscriptions)
-        setupNotifications()
+        
+        playerNotificationHandler?.setupNotifications()
+        
         do {
-            try AVAudioSession.sharedInstance().setCategory(.playback, mode: .default)
+            try audioSession?.setCategory(.playback, mode: .default)
             print("Playback OK")
-            try AVAudioSession.sharedInstance().setActive(true)
+            try audioSession?.setActive(true)
             print("Session is active")
             soundAudioPlayer = try AVAudioPlayer(contentsOf: url)
             soundAudioPlayer?.numberOfLoops = -1
@@ -141,105 +143,11 @@ extension PlayerViewModel {
     }
 }
 
-//MARK: - Handle background audio session
-extension PlayerViewModel {
-    private func setupNotifications() {
-        // Get the default notification center instance.
-        let notificationCenter = NotificationCenter.default
-        notificationCenter.addObserver(self,
-                       selector: #selector(handleInterruption),
-                       name: AVAudioSession.interruptionNotification,
-                       object: nil)
-        
-        setupMediaPlayerNotifications()
-    }
-    
-    private func setupMediaPlayerNotifications() {
-        let mediaPlayerCenter = MPRemoteCommandCenter.shared()
-        mediaPlayerCenter.playCommand.addTarget { event -> MPRemoteCommandHandlerStatus in
-            switch self.playerState {
-            case .pausedFromPlaying:
-                self.resumeAudioPlay()
-                return .success
-            case .pausedFromRecording:
-                self.resumeAudioRecording()
-                return .success
-            case .idle:
-                return .noActionableNowPlayingItem
-            case .playing, .recording:
-                return .commandFailed
-            }
-        }
-        mediaPlayerCenter.pauseCommand.addTarget { event -> MPRemoteCommandHandlerStatus in
-            switch self.playerState {
-            case .playing:
-                self.pauseAudioPlaying()
-                return .success
-            case .recording:
-                self.pauseAudioRecording()
-                return .success
-            case .idle:
-                return .noActionableNowPlayingItem
-            case .pausedFromPlaying, .pausedFromRecording:
-                return .commandFailed
-            }
-        }
-    }
-
-    @objc func handleInterruption(notification: Notification) {
-        guard let userInfo = notification.userInfo,
-            let typeValue = userInfo[AVAudioSessionInterruptionTypeKey] as? UInt,
-            let type = AVAudioSession.InterruptionType(rawValue: typeValue) else {
-                return
-        }
-
-        // Switch over the interruption type.
-        switch type {
-        case .began:
-            switch self.playerState {
-            case .playing:
-                self.playerState = .pausedFromPlaying
-                self.soundAudioPlayer?.pause()
-            case .recording:
-                self.playerState = .pausedFromRecording
-                self.audioRecorder?.pause()
-            default:
-                break
-            }
-        case .ended:
-           // An interruption ended. Resume playback, if appropriate.
-            guard let optionsValue = userInfo[AVAudioSessionInterruptionOptionKey] as? UInt else { return }
-            let options = AVAudioSession.InterruptionOptions(rawValue: optionsValue)
-            if options.contains(.shouldResume) {
-                // Interruption ended. Playback should resume.
-                switch self.playerState {
-                case .pausedFromPlaying:
-                    self.playerState = .playing
-                    self.soundAudioPlayer?.play()
-                case .pausedFromRecording:
-                    self.playerState = .recording
-                    self.audioRecorder?.record()
-                default:
-                    break
-                }
-            } else {
-                // Interruption ended. Playback should not resume.
-                self.playerState = .idle
-                self.stopAudioPlaying()
-                self.stopAudioRecording()
-            }
-
-        default: ()
-        }
-    }
-}
-
 //MARK: - Audio recorder
 extension PlayerViewModel {
     func stopAudioRecording() {
         audioRecorder?.stop()
         audioRecorder = nil
-        recordingSession = nil
     }
     
     func pauseAudioRecording() {
@@ -253,31 +161,34 @@ extension PlayerViewModel {
     }
     
     private func startAudioRecording() {
-        requestRecording()
+        setupRecording()
     }
     
-    private func requestRecording() {
-        self.recordingSession = AVAudioSession.sharedInstance()
-        
-        do {
-            try recordingSession?.setCategory(.playAndRecord, mode: .default)
-            try recordingSession?.setActive(true)
-            recordingSession?.requestRecordPermission() { [unowned self] allowed in
-                DispatchQueue.main.async {
-                    if allowed {
-                        self.startRecording()
-                    } else {
-                       print("Could not allowed to record audio")
-                    }
+    private func requestRecordingPrivelegies(and performTask: @escaping ()->Void ) {
+        self.audioSession = AVAudioSession.sharedInstance()
+        audioSession?.requestRecordPermission() { allowed in
+            DispatchQueue.main.async {
+                if allowed {
+                    performTask()
+                } else {
+                   print("Could not allowed to record audio")
                 }
             }
+        }
+    }
+    
+    private func setupRecording() {
+        do {
+            try audioSession?.setCategory(.playAndRecord, mode: .default)
+            try audioSession?.setActive(true)
+            self.startRecording()
         } catch {
             print(error.localizedDescription)
         }
     }
     
     private func startRecording() {
-        let audioFilename = getDocumentsDirectory().appendingPathComponent("recording.m4a")
+        let recordedAudioFilename = getDocumentsDirectory().appendingPathComponent("recording.m4a")
 
         let settings = [
             AVFormatIDKey: Int(kAudioFormatMPEG4AAC),
@@ -287,7 +198,7 @@ extension PlayerViewModel {
         ]
 
         do {
-            audioRecorder = try AVAudioRecorder(url: audioFilename, settings: settings)
+            audioRecorder = try AVAudioRecorder(url: recordedAudioFilename, settings: settings)
             audioRecorder?.record()
             self.playerState = .recording
         } catch {
@@ -303,6 +214,7 @@ extension PlayerViewModel {
     func finishRecording() {
         stopAudioRecording()
         self.playerState = .idle
+        audioSession = nil
         self.subscriptions.removeAll()
     }
 }

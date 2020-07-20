@@ -22,15 +22,15 @@ struct PlayerContentView: View {
                 .font(.headline)
                 .multilineTextAlignment(.center)
             if (viewModel.playerState == .playing) {
-                Text("Remain \(Int(viewModel.playingRemainingPlayingTime)) sec...").padding(.top)
+                Text("Play Sound Remain \(Int(viewModel.soundPlayingRemainingTime)) sec...").padding(.top)
             } else if (viewModel.playerState == .recording) {
-                Text("Remain \(Int(viewModel.recordingRemainingPlayingTime)) sec...").padding(.top)
+                Text("Record Remain \(Int(viewModel.recordingRemainingTime)) sec...").padding(.top)
             } else {
-                Text("Remain N sec...").padding(.top).hidden()
+                Text("Remain NaN sec...").padding(.top).hidden()
             }
             Spacer()
-            ButtonView(timerName: "Sound Timer", actionSheetDataSource: viewModel.possibkeSoundTimers, selectedTimerDuration: $selectedSoundTimer)
-            ButtonView(timerName: "Recording Duration", actionSheetDataSource: viewModel.possibkeRecordingTimers, selectedTimerDuration: $selectedRecordingTimer)
+            ButtonView(timerName: "Sound Timer", actionSheetDataSource: viewModel.playerModel.possibleSoundTimers.map { $0.readableDuration }, selectedTimerDuration: $selectedSoundTimer)
+            ButtonView(timerName: "Recording Duration", actionSheetDataSource: viewModel.playerModel.possibleRecordingTimers.map { $0.readableDuration }, selectedTimerDuration: $selectedRecordingTimer)
             Divider()
                 .padding([.leading, .bottom, .trailing])
             Button(action: {
@@ -38,13 +38,22 @@ struct PlayerContentView: View {
             }) {
                 if viewModel.playerState == .idle || viewModel.playerState == .pausedFromPlaying || viewModel.playerState == .pausedFromRecording {
                     Text("Start")
-                        .padding(.vertical)
+                        .padding()
+                        .foregroundColor(.white)
+                        .background(Color.blue)
+                        .cornerRadius(12.0)
                 } else if selectedSoundTimer == 0 || selectedRecordingTimer == 0 {
                     Text("Stop")
-                        .padding(.vertical)
+                        .padding()
+                        .foregroundColor(.white)
+                        .background(Color.blue)
+                        .cornerRadius(12.0)
                 } else  {
                     Text("Pause")
-                        .padding(.vertical)
+                        .padding()
+                        .foregroundColor(.white)
+                        .background(Color.blue)
+                        .cornerRadius(12.0)
                 }
             }
         }
