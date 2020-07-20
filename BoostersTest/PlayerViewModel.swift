@@ -36,9 +36,9 @@ public final class PlayerViewModel: ObservableObject {
         }
     }
     
-    func toggleAudioFlow(withSoundTimer selectedSoundTimerPosition: Int, withRecordingTimer selectedRecordingTimerPosition: Int) {
-        let selectedSoundDuration = playerModel.possibleSoundTimers[selectedSoundTimerPosition].durationInSeconds
-        let selectedRecordingDuration = playerModel.possibleRecordingTimers[selectedRecordingTimerPosition].durationInSeconds
+    func toggleAudioFlow(withSoundTimerDuration selectedSoundTimerDurationPosition: Int, withRecordingTimerDuration selectedRecordingTimerDurationPosition: Int) {
+        let selectedSoundDuration = playerModel.possibleSoundTimerDurations[selectedSoundTimerDurationPosition].durationInSeconds
+        let selectedRecordingDuration = playerModel.possibleRecordingTimerDurations[selectedRecordingTimerDurationPosition].durationInSeconds
         guard selectedSoundDuration != 0 || selectedRecordingDuration != 0 else {
             stopAudioPlaying()
             finishRecording()
@@ -75,6 +75,7 @@ public final class PlayerViewModel: ObservableObject {
                 soundPlayingRemainingTime = 0
                 stopAudioPlaying()
                 startAudioRecording()
+                print("Stop playing audio, start recording")
             } else {
                 soundPlayingRemainingTime = remainingPlayingTime
             }
@@ -84,6 +85,7 @@ public final class PlayerViewModel: ObservableObject {
             if remainingRecordingTime <= 0 {
                 recordingRemainingTime = 0
                 finishRecording()
+                print("Stop audio recording")
             } else {
                 recordingRemainingTime = remainingRecordingTime
             }
@@ -102,16 +104,19 @@ extension PlayerViewModel: PlayerStateHandlerInteractionProtocol {
     
     func pauseAudioPlaying() {
         soundAudioPlayer?.pause()
+        pauseAudioRecorer()
         playerState = .pausedFromPlaying
     }
     
     func resumeAudioPlay() {
         soundAudioPlayer?.play()
+        setupAudioRecordingStart()
         playerState = .playing
     }
     
-    private func startAudioCycle() {
+    func startAudioCycle() {
         requestRecordingPrivelegies { [unowned self] in
+            self.prepareRecordingSession()
             self.loadAudioForPlaying()
         }
     }
@@ -135,8 +140,8 @@ extension PlayerViewModel: PlayerStateHandlerInteractionProtocol {
             soundAudioPlayer = try AVAudioPlayer(contentsOf: url)
             soundAudioPlayer?.numberOfLoops = -1
             soundAudioPlayer?.prepareToPlay()
-            soundAudioPlayer?.play()
-            print("Player starts to play")
+            let playerStartsPlay = soundAudioPlayer?.play()
+            print("Player starts to play: \(playerStartsPlay ?? false)")
         } catch {
             print(error.localizedDescription)
         }
@@ -151,12 +156,12 @@ extension PlayerViewModel {
     }
     
     func pauseAudioRecording() {
-        audioRecorder?.pause()
+        pauseAudioRecorer()
         playerState = .pausedFromRecording
     }
     
     func resumeAudioRecording() {
-        audioRecorder?.record()
+        setupAudioRecordingStart()
         playerState = .recording
     }
     
@@ -164,7 +169,15 @@ extension PlayerViewModel {
         setupRecording()
     }
     
-    private func requestRecordingPrivelegies(and performTask: @escaping ()->Void ) {
+    private func setupAudioRecordingStart() {
+        audioRecorder?.record(atTime: audioRecorder?.currentTime ?? 0 + soundPlayingRemainingTime)
+    }
+    
+    private func pauseAudioRecorer() {
+        audioRecorder?.pause()
+    }
+    
+    private func requestRecordingPrivelegies(and performTask: @escaping ()->Void) {
         self.audioSession = AVAudioSession.sharedInstance()
         audioSession?.requestRecordPermission() { allowed in
             DispatchQueue.main.async {
@@ -187,7 +200,7 @@ extension PlayerViewModel {
         }
     }
     
-    private func startRecording() {
+    private func prepareRecordingSession() {
         let recordedAudioFilename = getDocumentsDirectory().appendingPathComponent("recording.m4a")
 
         let settings = [
@@ -198,12 +211,20 @@ extension PlayerViewModel {
         ]
 
         do {
+            try audioSession?.setCategory(.playAndRecord, mode: .default)
+            try audioSession?.setActive(true)
             audioRecorder = try AVAudioRecorder(url: recordedAudioFilename, settings: settings)
-            audioRecorder?.record()
-            self.playerState = .recording
+            let startRecordStatus = audioRecorder?.record(atTime: audioRecorder?.currentTime ?? 0 + soundPlayingRemainingTime)
+            print("Record session was created: \(startRecordStatus ?? false)")
         } catch {
+            print(error.localizedDescription)
             finishRecording()
         }
+    }
+    
+    private func startRecording() {
+        //Call in time when audio recorder session starts a delayed record process
+        self.playerState = .recording
     }
     
     private func getDocumentsDirectory() -> URL {
@@ -212,9 +233,14 @@ extension PlayerViewModel {
     }
     
     func finishRecording() {
-        stopAudioRecording()
-        self.playerState = .idle
-        audioSession = nil
-        self.subscriptions.removeAll()
+        do {
+            stopAudioRecording()
+            self.playerState = .idle
+            try audioSession?.setActive(false)
+            audioSession = nil
+            self.subscriptions.removeAll()
+        } catch {
+            print(error.localizedDescription)
+        }
     }
 }

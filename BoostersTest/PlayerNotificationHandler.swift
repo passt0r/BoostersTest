@@ -109,8 +109,6 @@ class PlayerNotificationHandler {
                 }
             } else {
                 // Interruption ended. Playback should not resume.
-                playerDelegate.stopAudioPlaying()
-                playerDelegate.finishRecording()
             }
 
         default: ()

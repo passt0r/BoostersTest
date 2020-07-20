@@ -13,8 +13,8 @@ struct PlayerContentView: View {
     
     @ObservedObject var viewModel: PlayerViewModel
     
-    @State private var selectedSoundTimer = 0
-    @State private var selectedRecordingTimer = 0
+    @State private var selectedSoundDuration = 0
+    @State private var selectedRecordingDuration = 0
     
     var body: some View {
         VStack {
@@ -29,12 +29,12 @@ struct PlayerContentView: View {
                 Text("Remain NaN sec...").padding(.top).hidden()
             }
             Spacer()
-            ButtonView(timerName: "Sound Timer", actionSheetDataSource: viewModel.playerModel.possibleSoundTimers.map { $0.readableDuration }, selectedTimerDuration: $selectedSoundTimer)
-            ButtonView(timerName: "Recording Duration", actionSheetDataSource: viewModel.playerModel.possibleRecordingTimers.map { $0.readableDuration }, selectedTimerDuration: $selectedRecordingTimer)
+            ButtonView(timerName: "Sound Timer", actionSheetDataSource: viewModel.playerModel.possibleSoundTimerDurations.map { $0.readableDuration }, selectedTimerDuration: $selectedSoundDuration)
+            ButtonView(timerName: "Recording Duration", actionSheetDataSource: viewModel.playerModel.possibleRecordingTimerDurations.map { $0.readableDuration }, selectedTimerDuration: $selectedRecordingDuration)
             Divider()
                 .padding([.leading, .bottom, .trailing])
             Button(action: {
-                self.viewModel.toggleAudioFlow(withSoundTimer: selectedSoundTimer, withRecordingTimer: selectedRecordingTimer)
+                self.viewModel.toggleAudioFlow(withSoundTimerDuration: selectedSoundDuration, withRecordingTimerDuration: selectedRecordingDuration)
             }) {
                 if viewModel.playerState == .idle || viewModel.playerState == .pausedFromPlaying || viewModel.playerState == .pausedFromRecording {
                     Text("Start")
@@ -42,7 +42,7 @@ struct PlayerContentView: View {
                         .foregroundColor(.white)
                         .background(Color.blue)
                         .cornerRadius(12.0)
-                } else if selectedSoundTimer == 0 || selectedRecordingTimer == 0 {
+                } else if viewModel.playerModel.possibleSoundTimerDurations[selectedSoundDuration].durationInSeconds == 0 || viewModel.playerModel.possibleRecordingTimerDurations[selectedRecordingDuration].durationInSeconds == 0 {
                     Text("Stop")
                         .padding()
                         .foregroundColor(.white)

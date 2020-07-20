@@ -9,14 +9,14 @@
 import Foundation
 
 public class PlayerModel {
-    public let possibleSoundTimers: [Duration] = [
+    public let possibleSoundTimerDurations: [Duration] = [
         Duration(readableDuration: "off", durationInSeconds: 0),
         Duration(readableDuration: "1 min", durationInSeconds: 60),
         Duration(readableDuration: "5 min", durationInSeconds: 60*5),
         Duration(readableDuration: "10 min", durationInSeconds: 60*10)
     ]
     
-    public let possibleRecordingTimers: [Duration] = [
+    public let possibleRecordingTimerDurations: [Duration] = [
         Duration(readableDuration: "off", durationInSeconds: 0),
         Duration(readableDuration: "1 min", durationInSeconds: 60),
         Duration(readableDuration: "5 min", durationInSeconds: 60*5),
