@@ -33,24 +33,27 @@ public final class PlayerViewModel: ObservableObject {
         }
     }
     
-    public func toggleAudioFlow(withSoundTimerDuration selectedSoundTimerDurationPosition: Int, withRecordingTimerDuration selectedRecordingTimerDurationPosition: Int) {
+    public func toggleAudioFlow(withSoundTimerDuration selectedSoundTimerDurationPosition: Int, withRecordingTimerDuration selectedRecordingTimerDurationPosition: Int, durationsWasChanged: Bool) {
         guard selectedSoundTimerDurationPosition < playerModel.possibleSoundTimerDurations.count,
               selectedRecordingTimerDurationPosition < playerModel.possibleRecordingTimerDurations.count else {
             let zeroDuration: TimeInterval = 0
-            toggleAudioFlow(with: zeroDuration, and: zeroDuration)
+            toggleAudioFlow(with: zeroDuration, and: zeroDuration, durationsWasChanged: durationsWasChanged)
             return
         }
         let selectedSoundDuration = playerModel.possibleSoundTimerDurations[selectedSoundTimerDurationPosition].durationInSeconds
         let selectedRecordingDuration = playerModel.possibleRecordingTimerDurations[selectedRecordingTimerDurationPosition].durationInSeconds
         
-        toggleAudioFlow(with: selectedSoundDuration, and: selectedRecordingDuration)
+        toggleAudioFlow(with: selectedSoundDuration, and: selectedRecordingDuration, durationsWasChanged: durationsWasChanged)
     }
     
-    func toggleAudioFlow(with selectedSoundDuration: TimeInterval, and selectedRecordingDuration: TimeInterval) {
+    func toggleAudioFlow(with selectedSoundDuration: TimeInterval, and selectedRecordingDuration: TimeInterval, durationsWasChanged: Bool) {
         guard selectedSoundDuration != 0 && selectedRecordingDuration != 0 else {
             stopAudioPlaying()
             finishRecording()
             return
+        }
+        if durationsWasChanged {
+            setRemainingTimersDuration(withPlayingTimeInterval: selectedSoundDuration, withRecordingTimeInterval: selectedRecordingDuration)
         }
         switch playerState {
         case .idle:

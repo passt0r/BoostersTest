@@ -15,6 +15,7 @@ struct PlayerContentView: View {
     
     @State private var selectedSoundDuration = 0
     @State private var selectedRecordingDuration = 0
+    @State private var durationsWasChanged = false
     
     var body: some View {
         VStack {
@@ -29,12 +30,13 @@ struct PlayerContentView: View {
                 Text("Remain NaN sec...").padding(.top).hidden()
             }
             Spacer()
-            ButtonView(timerName: "Sound Timer", actionSheetDataSource: viewModel.playerModel.possibleSoundTimerDurations.map { $0.readableDuration }, selectedTimerDuration: $selectedSoundDuration)
-            ButtonView(timerName: "Recording Duration", actionSheetDataSource: viewModel.playerModel.possibleRecordingTimerDurations.map { $0.readableDuration }, selectedTimerDuration: $selectedRecordingDuration)
+            ButtonView(timerName: "Sound Timer", actionSheetDataSource: viewModel.playerModel.possibleSoundTimerDurations.map { $0.readableDuration }, selectedTimerDuration: $selectedSoundDuration, durationsWasChanged: $durationsWasChanged)
+            ButtonView(timerName: "Recording Duration", actionSheetDataSource: viewModel.playerModel.possibleRecordingTimerDurations.map { $0.readableDuration }, selectedTimerDuration: $selectedRecordingDuration, durationsWasChanged: $durationsWasChanged)
             Divider()
                 .padding([.leading, .bottom, .trailing])
             Button(action: {
-                self.viewModel.toggleAudioFlow(withSoundTimerDuration: selectedSoundDuration, withRecordingTimerDuration: selectedRecordingDuration)
+                self.viewModel.toggleAudioFlow(withSoundTimerDuration: selectedSoundDuration, withRecordingTimerDuration: selectedRecordingDuration, durationsWasChanged: durationsWasChanged)
+                self.durationsWasChanged = false
             }) {
                 if viewModel.playerState == .idle || viewModel.playerState == .pausedFromPlaying || viewModel.playerState == .pausedFromRecording {
                     Text("Start")
@@ -66,6 +68,7 @@ struct ButtonView: View {
     let timerName: String
     let actionSheetDataSource: [String]
     @Binding var selectedTimerDuration: Int
+    @Binding var durationsWasChanged: Bool
     
     @State private var showSelectedTimerDurationActionSheet = false
     
@@ -91,7 +94,10 @@ struct ButtonView: View {
     
     private func createActionsForTimer() -> [ActionSheet.Button] {
         var actionSheets = actionSheetDataSource.map({ (timerName) -> ActionSheet.Button in
-            return ActionSheet.Button.default(Text(timerName), action: { self.selectedTimerDuration = actionSheetDataSource.firstIndex(of: timerName) ?? 0 } )
+            return ActionSheet.Button.default(Text(timerName), action: {
+                self.selectedTimerDuration = actionSheetDataSource.firstIndex(of: timerName) ?? 0
+                self.durationsWasChanged = true
+            } )
         })
         actionSheets.append(.cancel())
         return actionSheets

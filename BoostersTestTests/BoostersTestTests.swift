@@ -35,7 +35,7 @@ class BoostersTestTests: XCTestCase {
         var result: PlayerState? = nil
         
         //When
-        playerViewModel.toggleAudioFlow(withSoundTimerDuration: soundTimerInDataBasePosition, withRecordingTimerDuration: recordTimerInDataBasePosition)
+        playerViewModel.toggleAudioFlow(withSoundTimerDuration: soundTimerInDataBasePosition, withRecordingTimerDuration: recordTimerInDataBasePosition, durationsWasChanged: true)
         
         playerViewModel.$playerState.sink { (receivedState) in
             result = receivedState
@@ -58,7 +58,7 @@ class BoostersTestTests: XCTestCase {
         var result: PlayerState? = nil
         
         //When
-        playerViewModel.toggleAudioFlow(withSoundTimerDuration: soundTimerInDataBasePosition, withRecordingTimerDuration: recordTimerInDataBasePosition)
+        playerViewModel.toggleAudioFlow(withSoundTimerDuration: soundTimerInDataBasePosition, withRecordingTimerDuration: recordTimerInDataBasePosition, durationsWasChanged: false)
         playerViewModel.pauseAudioPlaying()
         
         playerViewModel.$playerState.sink { (receivedState) in
@@ -82,7 +82,7 @@ class BoostersTestTests: XCTestCase {
         var result: PlayerState? = nil
         
         //When
-        playerViewModel.toggleAudioFlow(with: soundTimerDuration, and: recordTimerDuration)
+        playerViewModel.toggleAudioFlow(with: soundTimerDuration, and: recordTimerDuration, durationsWasChanged: false)
         
         
         playerViewModel.$playerState.sink { (receivedState) in
@@ -107,8 +107,8 @@ class BoostersTestTests: XCTestCase {
         var result: PlayerState? = nil
         
         //When
-        playerViewModel.toggleAudioFlow(withSoundTimerDuration: soundTimerInDataBasePosition, withRecordingTimerDuration: recordTimerInDataBasePosition)
-        playerViewModel.toggleAudioFlow(with: zeroSoundDuration,and: zeroRecordDuration)
+        playerViewModel.toggleAudioFlow(withSoundTimerDuration: soundTimerInDataBasePosition, withRecordingTimerDuration: recordTimerInDataBasePosition, durationsWasChanged: true)
+        playerViewModel.toggleAudioFlow(with: zeroSoundDuration,and: zeroRecordDuration, durationsWasChanged: true)
         
         playerViewModel.$playerState.sink { (receivedState) in
             result = receivedState
