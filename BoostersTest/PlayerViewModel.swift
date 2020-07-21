@@ -47,7 +47,7 @@ public final class PlayerViewModel: ObservableObject {
     }
     
     func toggleAudioFlow(with selectedSoundDuration: TimeInterval, and selectedRecordingDuration: TimeInterval) {
-        guard selectedSoundDuration != 0 || selectedRecordingDuration != 0 else {
+        guard selectedSoundDuration != 0 && selectedRecordingDuration != 0 else {
             stopAudioPlaying()
             finishRecording()
             return
