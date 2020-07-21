@@ -24,54 +24,101 @@ class BoostersTestTests: XCTestCase {
         // Put teardown code here. This method is called after the invocation of each test method in the class.
         subscriptions = []
     }
-
-    func testExample() throws {
-        // This is an example of a functional test case.
-        // Use XCTAssert and related functions to verify your tests produce the correct results.
-    }
-    
-    func testPlaybackStarts() throws {
-        //Given
-        let statusBeforeStarting = playerViewModel.playerState
-        let expectation = self.expectation(description: #function)
-        playerViewModel.soundPlayingRemainingTime = 2
-        playerViewModel.recordingRemainingTime = 2
-        var result: PlayerState? = nil
-        
-        //When
-        playerViewModel.$playerState.sink { (receivedState) in
-            result = receivedState
-            expectation.fulfill()
-        }.store(in: &subscriptions)
-        
-        playerViewModel.startAudioCycle()
-        
-        //Then
-        waitForExpectations(timeout: 2, handler: nil)
-        
-        XCTAssert(statusBeforeStarting != result, "Results expected to be: \(PlayerState.playing), but was: \(result)")
-    }
     
     func testStatusChanging() throws {
         //Given
         let statusBeforeStarting = playerViewModel.playerState
+        let expected = PlayerState.playing
         let expectation = self.expectation(description: #function)
         let soundTimerInDataBasePosition = 1
         let recordTimerInDataBasePosition = 1
         var result: PlayerState? = nil
         
         //When
+        playerViewModel.toggleAudioFlow(withSoundTimerDuration: soundTimerInDataBasePosition, withRecordingTimerDuration: recordTimerInDataBasePosition)
+        
         playerViewModel.$playerState.sink { (receivedState) in
             result = receivedState
             expectation.fulfill()
         }.store(in: &subscriptions)
         
+        //Then
+        waitForExpectations(timeout: 10, handler: nil)
+        
+        XCTAssert(statusBeforeStarting != result, "Results expected to be: \(expected), but was: \(String(describing: result))")
+    }
+    
+    func testPausePlayingStatus() throws {
+        //Given
+        let statusBeforeStarting = playerViewModel.playerState
+        let expected = PlayerState.pausedFromPlaying
+        let expectation = self.expectation(description: #function)
+        let soundTimerInDataBasePosition = 1
+        let recordTimerInDataBasePosition = 1
+        var result: PlayerState? = nil
+        
+        //When
         playerViewModel.toggleAudioFlow(withSoundTimerDuration: soundTimerInDataBasePosition, withRecordingTimerDuration: recordTimerInDataBasePosition)
+        playerViewModel.pauseAudioPlaying()
+        
+        playerViewModel.$playerState.sink { (receivedState) in
+            result = receivedState
+            expectation.fulfill()
+        }.store(in: &subscriptions)
         
         //Then
         waitForExpectations(timeout: 10, handler: nil)
         
-        XCTAssert(statusBeforeStarting != result, "Results expected to be: \(PlayerState.playing), but was: \(result)")
+        XCTAssert(statusBeforeStarting != result, "Results expected to be: \(expected), but was: \(String(describing: result))")
+    }
+    
+    func testPauseRecordStatus() throws {
+        //Given
+        let statusBeforeStarting = playerViewModel.playerState
+        let expected = PlayerState.pausedFromRecording
+        let expectation = self.expectation(description: #function)
+        let soundTimerDuration: TimeInterval = 1
+        let recordTimerDuration: TimeInterval = 6
+        var result: PlayerState? = nil
+        
+        //When
+        playerViewModel.toggleAudioFlow(with: soundTimerDuration, and: recordTimerDuration)
+        
+        
+        playerViewModel.$playerState.sink { (receivedState) in
+            result = receivedState
+            expectation.fulfill()
+        }.store(in: &subscriptions)
+        
+        //Then
+        waitForExpectations(timeout: 10, handler: nil)
+        
+        XCTAssert(statusBeforeStarting != result, "Results expected to be: \(expected), but was: \(String(describing: result))")
+    }
+    
+    func testStopStatus() throws {
+        //Given
+        let expected = PlayerState.idle
+        let expectation = self.expectation(description: #function)
+        let soundTimerInDataBasePosition = 1
+        let recordTimerInDataBasePosition = 1
+        let zeroSoundDuration: TimeInterval = 0
+        let zeroRecordDuration: TimeInterval = 0
+        var result: PlayerState? = nil
+        
+        //When
+        playerViewModel.toggleAudioFlow(withSoundTimerDuration: soundTimerInDataBasePosition, withRecordingTimerDuration: recordTimerInDataBasePosition)
+        playerViewModel.toggleAudioFlow(with: zeroSoundDuration,and: zeroRecordDuration)
+        
+        playerViewModel.$playerState.sink { (receivedState) in
+            result = receivedState
+            expectation.fulfill()
+        }.store(in: &subscriptions)
+        
+        //Then
+        waitForExpectations(timeout: 10, handler: nil)
+        
+        XCTAssert(result == expected, "Results expected to be: \(expected), but was: \(String(describing: result))")
     }
 
 }

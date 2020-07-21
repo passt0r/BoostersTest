@@ -33,15 +33,25 @@ public final class PlayerViewModel: ObservableObject {
         }
     }
     
-    func toggleAudioFlow(withSoundTimerDuration selectedSoundTimerDurationPosition: Int, withRecordingTimerDuration selectedRecordingTimerDurationPosition: Int) {
+    public func toggleAudioFlow(withSoundTimerDuration selectedSoundTimerDurationPosition: Int, withRecordingTimerDuration selectedRecordingTimerDurationPosition: Int) {
+        guard selectedSoundTimerDurationPosition < playerModel.possibleSoundTimerDurations.count,
+              selectedRecordingTimerDurationPosition < playerModel.possibleRecordingTimerDurations.count else {
+            let zeroDuration: TimeInterval = 0
+            toggleAudioFlow(with: zeroDuration, and: zeroDuration)
+            return
+        }
         let selectedSoundDuration = playerModel.possibleSoundTimerDurations[selectedSoundTimerDurationPosition].durationInSeconds
         let selectedRecordingDuration = playerModel.possibleRecordingTimerDurations[selectedRecordingTimerDurationPosition].durationInSeconds
+        
+        toggleAudioFlow(with: selectedSoundDuration, and: selectedRecordingDuration)
+    }
+    
+    func toggleAudioFlow(with selectedSoundDuration: TimeInterval, and selectedRecordingDuration: TimeInterval) {
         guard selectedSoundDuration != 0 || selectedRecordingDuration != 0 else {
             stopAudioPlaying()
             finishRecording()
             return
         }
-        
         switch playerState {
         case .idle:
             playerState = .playing
@@ -120,7 +130,7 @@ extension PlayerViewModel: PlayerStateHandlerInteractionProtocol {
         }
     }
     
-    func startAudioCycle() {
+    private func startAudioCycle() {
         requestRecordingPrivelegies { [unowned self] in
             self.prepareRecordingSession()
             self.loadAudioForPlaying()
