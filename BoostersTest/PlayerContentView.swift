@@ -38,28 +38,30 @@ struct PlayerContentView: View {
                 self.viewModel.toggleAudioFlow(withSoundTimerDuration: selectedSoundDuration, withRecordingTimerDuration: selectedRecordingDuration, durationsWasChanged: durationsWasChanged)
                 self.durationsWasChanged = false
             }) {
-                if viewModel.playerState == .idle || viewModel.playerState == .pausedFromPlaying || viewModel.playerState == .pausedFromRecording {
-                    Text("Start")
-                        .padding()
-                        .foregroundColor(.white)
-                        .background(Color.blue)
-                        .cornerRadius(12.0)
-                } else if viewModel.playerModel.possibleSoundTimerDurations[selectedSoundDuration].durationInSeconds == 0 || viewModel.playerModel.possibleRecordingTimerDurations[selectedRecordingDuration].durationInSeconds == 0 {
-                    Text("Stop")
-                        .padding()
-                        .foregroundColor(.white)
-                        .background(Color.blue)
-                        .cornerRadius(12.0)
+                if (viewModel.playerState == .pausedFromPlaying && !isDurationsIsNotZero) || (viewModel.playerState == .pausedFromRecording && !isDurationsIsNotZero) {
+                    getStartButton(with: "Stop")
+                } else if viewModel.playerState == .idle || viewModel.playerState == .pausedFromPlaying || viewModel.playerState == .pausedFromRecording {
+                    getStartButton(with: "Start")
+                } else if !isDurationsIsNotZero {
+                    getStartButton(with: "Stop")
                 } else  {
-                    Text("Pause")
-                        .padding()
-                        .foregroundColor(.white)
-                        .background(Color.blue)
-                        .cornerRadius(12.0)
+                    getStartButton(with: "Pause")
                 }
             }
         }
         .padding(.bottom)
+    }
+    
+    private var isDurationsIsNotZero: Bool {
+        return !(viewModel.playerModel.possibleSoundTimerDurations[selectedSoundDuration].durationInSeconds == 0 || viewModel.playerModel.possibleRecordingTimerDurations[selectedRecordingDuration].durationInSeconds == 0)
+    }
+    
+    private func getStartButton(with text: String) -> some View {
+        return Text(text)
+            .padding()
+            .foregroundColor(.white)
+            .background(Color.blue)
+            .cornerRadius(12.0)
     }
 }
 
